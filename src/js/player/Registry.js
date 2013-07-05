@@ -332,6 +332,7 @@ $ADP.Registry = $ADP.Registry || {
     var domId = args.domId;
     var position = args.position || 'top-right';
     var usePopup = args.usePopup || true;
+    var useExternalPopup = args.useExternalPopup || false;
     var renderCloseButton = args.renderCloseButton == false ? false : true;
     if (!this.data[id]) this.data[id]={domId: null, items:[]};
     
@@ -345,6 +346,7 @@ $ADP.Registry = $ADP.Registry || {
 	    footer: footer,
 	    publisherInfo: publisherInfo,
 	    usePopup: usePopup,
+	    useExternalPopup: useExternalPopup,
 	    renderCloseButton: renderCloseButton
 	  });
 	  player.inject();
@@ -456,7 +458,9 @@ $ADP.Registry = $ADP.Registry || {
    */
   collectPrivacy: function (id) {
 	  var usePopup = true;
+	  var useExternalPopup = false; 
 	  if(this.data[id].items && this.data[id].items.length) {
+	    useExternalPopup = this.data[id].player.useExternalPopupForPrivacyInfo() && (this.data[id].items.length === 1);
 		  for(var i in this.data[id].items) {
         try{
           if(this.data[id].items[i].usePopup == false) {
@@ -471,7 +475,11 @@ $ADP.Registry = $ADP.Registry || {
 		
 		try{
 		  var randomPopupName = 'adp_info_' + Math.floor(Math.random()*100001);
-		  popwin = window.open('',randomPopupName,'width=400,height=500,scrollbars=yes,location=0,menubar=0,toolbar=0,status=0');
+		  if(useExternalPopup){
+		    popwin = window.open(this.data[id].items[0].url, randomPopupName);
+		  } else {
+		    popwin = window.open('',randomPopupName,'width=400,height=500,scrollbars=yes,location=0,menubar=0,toolbar=0,status=0');
+		  }
 		} catch(e) {popwin = window.open('about:blank');}
 		
 		this.data[id].player.popup = popwin;

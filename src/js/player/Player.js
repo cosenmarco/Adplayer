@@ -117,6 +117,7 @@ if(!$ADP.Player) {
 	      this.publisherInfo = args.publisherInfo;
 	      this.position = args.position || 'top-right';
 	      this.usePopup = !!args.usePopup;
+	      this.useExternalPopup = !!args.useExternalPopup;
 	      this.renderCloseButton = !!args.renderCloseButton;
 	      this.popup = !!args.popup;
 	      this.browserLanguage = $ADP.Util.getBrowserLanguage();
@@ -235,7 +236,19 @@ if(!$ADP.Player) {
 	      return this.usePopup == false ? false : true;
 	    },
 	    
-	    /**
+      /**
+	     * @name $ADP.Player#useExternalPopupForPrivacyInfo
+	     * @function
+	     * @description Returns whether the privacy info should be displayed in a
+	     *              popup window that is provided by the advertiser.
+	     * 
+	     * @returns {boolean}
+	     */
+	      useExternalPopupForPrivacyInfo: function () {
+	        return this.useExternalPopup == false ? false : true;
+	      },
+	      
+	   /**
 		 * @name $ADP.Player#renderCloseButtonForPrivacyInfo
 		 * @function
 		 * @description Returns whether the close button should be displayed (in a
@@ -375,7 +388,9 @@ if(!$ADP.Player) {
 	      var position = this.getPosition();
 	      var obaId = this.getId();
 	      var usePopup = this.usePopupForPrivacyInfo();
-	      function renderInLayer() {
+        var useExternalPopup = this.useExternalPopupForPrivacyInfo();
+	      
+	      var renderInLayer = function() {
 	        var panel = document.getElementById('adp-panel-' + obaId);
 	        if (!panel) {
 	          var wrapper = document.getElementById('adp-wrapper-'+obaId);
@@ -388,26 +403,34 @@ if(!$ADP.Player) {
 	          wrapper.appendChild(panel);
 	        } else panel.style.display = 'block';
 	      }
+	      
+	      var renderInPopup = function(popwin) {
+          var title = this.getText({type: 'adchoices'});
+          var styles = document.styleSheets;
+          var popdoc = popwin.document;
+          window.popwin = popwin;
+          popdoc.write('<!doctype html><html><head><meta charset="utf-8" /><title>'+title+'</title>');
+          for (var k in styles)
+            if (styles[k].href) popdoc.write('<link rel="stylesheet" href="'+styles[k].href+'">');
+          popdoc.write('</head><body class="adp-popup"><div class="adp-wrapper"><div class="adp-panel">');
+          popdoc.write(this.getPanelHTML());
+          popdoc.write('</div></div></body></html>');
+          popdoc.close();
+          popwin.focus();
+	      }
+	      
 	      if (!usePopup) {
-	    	var popup = this.getPopup();
-	    	if (popup) { popup.close() }
+  	    	var popup = this.getPopup();
+  	    	if (popup) { popup.close() }
 	        renderInLayer.apply(this);
 	      } else {
-	        var title = this.getText({type: 'adchoices'});
-	        var styles = document.styleSheets;
 	        var popwin = this.getPopup();
-	        if(!popwin) { renderInLayer.apply(this); }
-	        else {
-	          var popdoc = popwin.document;
-	          window.popwin = popwin;
-	          popdoc.write('<!doctype html><html><head><meta charset="utf-8" /><title>'+title+'</title>');
-	          for (var k in styles)
-	            if (styles[k].href) popdoc.write('<link rel="stylesheet" href="'+styles[k].href+'">');
-	          popdoc.write('</head><body class="adp-popup"><div class="adp-wrapper"><div class="adp-panel">');
-	          popdoc.write(this.getPanelHTML());
-	          popdoc.write('</div></div></body></html>');
-	          popdoc.close();
-	          popwin.focus();
+	        if(!popwin) { 
+	          renderInLayer.apply(this); 
+	        } else {
+	          if(!useExternalPopup) {
+	            renderInPopup.call(this, popwin);
+	          }
 	        }
 	      }
 	    },
