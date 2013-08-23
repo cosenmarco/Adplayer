@@ -460,7 +460,7 @@ $ADP.Registry = $ADP.Registry || {
 	  var usePopup = true;
 	  var useExternalPopup = false; 
 	  if(this.data[id].items && this.data[id].items.length) {
-	    useExternalPopup = this.data[id].player.useExternalPopupForPrivacyInfo() && (this.data[id].items.length === 1);
+	    useExternalPopup = this.data[id].player.useExternalPopupForPrivacyInfo();
 		  for(var i in this.data[id].items) {
         try{
           if(this.data[id].items[i].usePopup == false) {
@@ -471,18 +471,18 @@ $ADP.Registry = $ADP.Registry || {
 	  }
 	  
 	  if(usePopup) {
-		if(this.data[id].player.popup) { this.data[id].player.popup.close() }
-		
-		try{
-		  var randomPopupName = 'adp_info_' + Math.floor(Math.random()*100001);
-		  if(useExternalPopup){
-		    popwin = window.open(this.data[id].items[0].url, randomPopupName);
-		  } else {
-		    popwin = window.open('',randomPopupName,'width=400,height=500,scrollbars=yes,location=0,menubar=0,toolbar=0,status=0');
-		  }
-		} catch(e) {popwin = window.open('about:blank');}
-		
-		this.data[id].player.popup = popwin;
+  		if(this.data[id].player.popup) { this.data[id].player.popup.close() }
+  		
+  		try{
+  		  var randomPopupName = 'adp_info_' + Math.floor(Math.random()*100001);
+  		  if(useExternalPopup){
+  		    popwin = window.open(this.data[id].items[0].url, randomPopupName);
+  		  } else {
+  		    popwin = window.open('',randomPopupName,'width=400,height=500,scrollbars=yes,location=0,menubar=0,toolbar=0,status=0');
+  		  }
+  		} catch(e) {popwin = window.open('about:blank');}
+  		
+  		this.data[id].player.popup = popwin;
 	  }
 		
 	  if(this.data[id].player.items && this.data[id].player.items.length) {
