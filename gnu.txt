@@ -9,6 +9,8 @@
             andreas.berenz@adition.com
             o.wagner@raumobil.de
             
+   Note: This is a customized version of the AdPlayer for ADTECH
+   This is publicly available here: https://github.com/cosenmarco/Adplayer
    -------------------------------------------------------------------------------------------
   
    This file is part of AdPlayer _@VERSION@_.
